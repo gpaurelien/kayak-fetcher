@@ -25,7 +25,7 @@ class Client:
         self.session.headers.update(Client.HEADERS)
         self.proxies = proxies
         self.logger = logger
-        self.metadata = {}
+        self.data = {} # ?
         self.session.cookies = None
         self.args = args
 
@@ -52,22 +52,27 @@ class Client:
     def cookies(self):
         return self.session.cookies
     
-    def fetch_data(self):
+    def fetch_data(self, params):
         """
-        Get the Kayak data and store it in metadata
+
         """
 
         try:
-            r = requests.get(
-            Client.BASE_URL,
-            cookies=self.session.cookies,
-            proxies=self.proxies
-            )
-            r.raise_for_status()
-
-            logger.debug("Request completed successfully")
+            with requests.get(
+                Client.BASE_URL,
+                cookies=self.session.cookies,
+                proxies=self.proxies,
+                params=params
+            ) as response:
+                response.raise_for_status()
         except HTTPError as e:
             logger.debug('HTTPError occured %s' % (e))
             raise
+        else:
+            logger.debug(
+                "Request completed successfully \
+                and stored in data"
+            )
 
-        return r.text
+            # convert the data into json format
+            # return it OR store it in instance variable
